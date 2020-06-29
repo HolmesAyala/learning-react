@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "babel-cli": "^6.26.0",
+    "@babel/cli": "^7.10.3",
     "babel-preset-react-app": "^3.1.2",
     "terser": "^4.8.0"
   }
