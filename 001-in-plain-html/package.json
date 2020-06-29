@@ -1,0 +1,15 @@
+{
+  "name": "001-in-plain-html",
+  "version": "1.0.0",
+  "description": "",
+  "main": "CounterButton.js",
+  "scripts": {
+    "minify": "npx terser -c -m -o js-min/CounterButton.min.js js/CounterButton.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "terser": "^4.8.0"
+  }
+}
