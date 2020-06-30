@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+/**
+ * Function component
+ */
+// function App() {
+// 	let user = {
+// 		firstName: "Holmes",
+// 		lastName: "Ayala",
+// 	};
+
+// 	let element = (
+// 		<h1>
+// 			Hello {user.firstName} {user.lastName}
+// 		</h1>
+// 	);
+
+// 	return element;
+// }
+
+/**
+ * Class component
+ */
+class App extends React.Component {
+
+	render() {
+		return (
+			<h1>
+				Hello {this.props.firstName} {this.props.lastName}
+			</h1>
+		);
+	}
 }
 
 export default App;
