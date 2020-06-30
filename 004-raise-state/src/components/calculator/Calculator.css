@@ -1,0 +1,22 @@
+.calculator {
+	max-width: 400px;
+	margin: 0 auto;
+}
+
+.calculator .result {
+	border-radius: 5px;
+	padding: 5px;
+	margin-bottom: 10px;
+
+	display: flex;
+	justify-content: flex-end;
+	
+	background-color: #e2e2e2;
+	border: 3px solid #777777;
+}
+
+.calculator .input input {
+	margin: 0 auto;
+	height: 10px;
+	font-size: 2rem;
+}
