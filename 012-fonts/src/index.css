@@ -1,0 +1,10 @@
+@import './styles/index.css';
+
+body {
+	margin: 0;
+	font-family: var(--fallback-font-names);
+}
+
+.fonts-loaded body {
+	font-family: var(--font-name), var(--fallback-font-names);
+}

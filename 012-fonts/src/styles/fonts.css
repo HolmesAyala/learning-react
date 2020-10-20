@@ -1,0 +1,7 @@
+@font-face {
+	font-family: 'Sansita Swashed';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Sansita Swashed'),
+		url(../fonts/sansita_swashed/static/SansitaSwashed-Regular.ttf) format('truetype');
+}
