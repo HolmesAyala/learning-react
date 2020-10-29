@@ -4,12 +4,12 @@ import React from 'react';
  */
 import './App.css';
 
-import CounterExample from './pages/CounterExample';
+import CounterExample from './pages/CounterExample/CounterExample';
 
 function App() {
   return (
     <div>
-      <h1>The app</h1>
+      <h1>App component</h1>
 
       <CounterExample />
     </div>
