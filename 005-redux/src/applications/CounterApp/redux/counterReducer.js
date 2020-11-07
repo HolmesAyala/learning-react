@@ -20,4 +20,12 @@ export const counterSlice = createSlice({
 
 export const { increment, decrement, changeBy } = counterSlice.actions;
 
+export const selectCounter = (state) => state.counter.value;
+
+export const changeByAsync = (value) => (dispatch) => {
+	setTimeout(() => {
+		dispatch(changeBy(value));
+	}, 2000);
+};
+
 export default counterSlice.reducer;

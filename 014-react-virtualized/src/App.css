@@ -1,0 +1,36 @@
+:root {
+  --border-radius: 5px;
+}
+
+*::-webkit-scrollbar {
+  width: 1rem;
+}
+
+
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.photo-item {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.473);
+}
+
+.photo-item .image {
+  width: 100%;
+  height: 100px;
+}
+
+.photo-item .title {
+  margin: 0;
+}
+
+.photo-list {
+  max-height: 400px;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
