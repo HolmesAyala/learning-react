@@ -1,0 +1,74 @@
+.root {
+	.postContainer {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
+
+		.postItem {
+			border-radius: 5px;
+			border: 1px solid #eeeeee;
+			box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+			padding: 1rem;
+
+			header {
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+
+				.editButton {
+					$withButton: 24px;
+					width: $withButton;
+					height: $withButton;
+					border-radius: 5px;
+
+					&:hover {
+						cursor: pointer;
+						background-color: #eeeeee;
+					}
+
+					& > *:first-child {
+						width: 100%;
+						height: 100%;
+					}
+				}
+			}
+
+			.author {
+				margin-top: 1rem;
+
+				.name {
+					font-style: italic;
+					font-weight: bold;
+				}
+			}
+
+			.timeAgoText {
+				color: #808080;
+			}
+
+			.content {
+				margin: 1rem 0;
+			}
+		}
+	}
+}
+
+.reactionButtonGroup {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 48px);
+	gap: 4px;
+
+	.reactionButton {
+		width: 48px;
+		height: 32px;
+		border-radius: 5px;
+		background-color: transparent;
+		border: 1px solid #eeeeee;
+		outline: none;
+		cursor: pointer;
+
+		&:hover {
+			box-shadow: 1px 1px 4px #eeeeee;
+		}
+	}
+}
