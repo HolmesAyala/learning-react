@@ -7,8 +7,10 @@ import styleSheet from './AddPost.module.scss';
  * Store
  */
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost } from '../../store/posts/postsReducer';
+import { addPostToApi } from '../../store/posts/postsReducer';
 import { selectUsers } from '../../store/users/usersReducer';
+// Utils
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const AddPost = () => {
   const dispatch = useDispatch();
@@ -22,10 +24,11 @@ const AddPost = () => {
   /**
    * State variables
    */
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const [titleFieldValue, setTitleFieldValue] = useState('');
   const [contentFieldValue, setContentFieldValue] = useState('');
-
   const [authorId, setAuthorId] = useState('');
 
   /**
@@ -39,17 +42,37 @@ const AddPost = () => {
     setAuthorId(event.target.value);
   }, []);
 
-  const onClickInCreatePostButton = () => {
-    dispatch(addPost({
-      title: titleFieldValue,
-      content: contentFieldValue,
-      authorId
-    }));
+  const onClickInCreatePostButton = async () => {
+    try {
+      setLoading(true);
+
+      const actionResult = await dispatch(addPostToApi({
+        title: titleFieldValue,
+        content: contentFieldValue,
+        authorId
+      }));
+
+      unwrapResult(actionResult);
+
+      setTitleFieldValue('');
+      setContentFieldValue('');
+      setAuthorId('');
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   /**
    * Components
    */
+
+  const errorAlert = error && (
+    <div className={styleSheet.errorAlert}>
+      {error}
+    </div>
+  );
 
   const authorOptions = users.map(user => {
     return (
@@ -60,6 +83,7 @@ const AddPost = () => {
   });
 
   const createButtonDisabled = (
+    loading ||
     !titleFieldValue.trim() ||
     !contentFieldValue.trim() ||
     !authorId
@@ -68,6 +92,8 @@ const AddPost = () => {
   return (
     <section className={styleSheet.root}>
       <h3>Add post</h3>
+
+      {errorAlert}
 
       <div className={styleSheet.inputContainer}>
         <label htmlFor="TF_Title">Title</label>

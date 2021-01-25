@@ -8,7 +8,13 @@ import styleSheet from './PostList.module.scss';
  * Store
  */
 import { useSelector, useDispatch } from 'react-redux';
-import { selectPosts, addValueToEmojiReactionCount } from '../../store/posts/postsReducer';
+import {
+  selectPosts,
+  addValueToEmojiReactionCount,
+  loadPostsFromApi,
+  selectRequestStatus,
+  selectRequestError
+} from '../../store/posts/postsReducer';
 import { selectUserById } from '../../store/users/usersReducer';
 /**
  * Routing
@@ -22,6 +28,9 @@ import { ReactComponent as EditIcon } from '../../../assets/pencil.svg';
  * Utils
  */
 import { parseISO, formatDistanceToNow } from 'date-fns';
+import _ from 'lodash';
+// Constants
+import { Status as PostRequestStatus } from '../../store/posts/initialState';
 
 const Author = ({ id }) => {
   const author = useSelector(selectUserById(id));
@@ -174,18 +183,52 @@ PostCard.propTypes = {
 }
 
 const PostList = () => {
-  const posts = useSelector(selectPosts);
+  const dispatch = useDispatch();
 
-  const postList = posts.map(post => {
+  const postsRequestStatus = useSelector(selectRequestStatus);
+  const postsRequestError = useSelector(selectRequestError);
+
+  const posts = useSelector(selectPosts);
+  const sortedPosts = _.cloneDeep(posts).sort((postA, postB) => postB.createdAt.localeCompare(postA.createdAt));
+
+  /**
+   * Effects
+   */
+
+  React.useEffect(() => {
+    if (postsRequestStatus === PostRequestStatus.IDLE) {
+      dispatch(loadPostsFromApi());
+    }
+  }, [postsRequestStatus, dispatch]);
+
+  /**
+   * Components to render
+   */
+
+  const loadingIndicator = postsRequestStatus === PostRequestStatus.LOADING && (
+    <div>Loading...</div>
+  );
+
+  const errorIndicator = postsRequestStatus === PostRequestStatus.ERROR && (
+    <div className={styleSheet.errorAlert}>
+      {postsRequestError}
+    </div>
+  )
+
+  const postsToRender = sortedPosts.map(post => {
     return <PostCard key={post.id} post={post} />;
   });
 
   return (
     <div className={styleSheet.root}>
-      <h3>Post list</h3>
+      <h3 className={styleSheet.title}>Post list</h3>
+
+      {loadingIndicator}
+
+      {errorIndicator}
 
       <div className={styleSheet.postContainer}>
-        {postList}
+        {postsToRender}
       </div>
     </div>
   );

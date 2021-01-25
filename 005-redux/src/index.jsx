@@ -1,16 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-/**
- * Store
- */
-
-/**
- * Styles
- */
+// Styles
 import './index.css';
-/**
- * Components
- */
+// Components
 import App from './App';
 
 ReactDOM.render(

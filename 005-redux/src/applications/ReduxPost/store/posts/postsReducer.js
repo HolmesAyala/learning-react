@@ -1,100 +1,36 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import _ from 'lodash';
-import { sub } from 'date-fns';
-import faker from 'faker';
-import { initialState as usersInitialState } from '../users/usersReducer';
+import initialState from './initialState';
+import axios from 'axios';
+// Constants
+import { Status } from './initialState';
 
-/**
- * @typedef {Object} EmojiReaction
- * @property {string} emoji
- * @property {number} count
- */
+const SLICE_NAME = 'posts';
 
-/**
- * @typedef {Object} Post
- * @property {string} id
- * @property {string} createdAt
- * @property {string} title
- * @property {string} content
- * @property {string} authorId
- * @property {EmojiReaction[]} emojiReactions
- */
+export const loadPostsFromApi = createAsyncThunk(`${SLICE_NAME}/getPosts`, async () => {
+	const response = await axios.get(`${process.env.REACT_APP_API_URL}/posts`);
 
-/** @type {EmojiReaction[]} */
-export const DEFAULT_EMOJI_REACTIONS = [
-	{
-		emoji: '👍',
-		count: 0,
-	},
-	{
-		emoji: '🎉',
-		count: 0,
-	},
-	{
-		emoji: '❤️',
-		count: 0,
-	},
-	{
-		emoji: '🚀',
-		count: 0,
-	},
-	{
-		emoji: '👀',
-		count: 0,
-	},
-];
+	return response.data;
+});
 
-/** @type {Post[]} */
-const initialState = [
-	{
-		id: faker.random.uuid(),
-		createdAt: sub(new Date(), { minutes: 5 }).toISOString(),
-		title: faker.name.title(),
-		content: faker.lorem.words(_.random(3, 10)),
-		authorId: _.sample(usersInitialState).id,
-		emojiReactions: _.cloneDeep(DEFAULT_EMOJI_REACTIONS),
-	},
-	{
-		id: faker.random.uuid(),
-		createdAt: sub(new Date(), { minutes: 25 }).toISOString(),
-		title: faker.name.title(),
-		content: faker.lorem.words(_.random(3, 10)),
-		authorId: _.sample(usersInitialState).id,
-		emojiReactions: _.cloneDeep(DEFAULT_EMOJI_REACTIONS),
-	},
-	{
-		id: faker.random.uuid(),
-		createdAt: sub(new Date(), { hours: 5 }).toISOString(),
-		title: faker.name.title(),
-		content: faker.lorem.words(_.random(3, 10)),
-		authorId: _.sample(usersInitialState).id,
-		emojiReactions: _.cloneDeep(DEFAULT_EMOJI_REACTIONS),
-	},
-];
+export const addPostToApi = createAsyncThunk(
+	`${SLICE_NAME}/addPostFromApi`,
+	/**
+	 * @param {{title: string, content: string, authorId: string}} data
+	 */
+	async (data) => {
+		const response = await axios.post(`${process.env.REACT_APP_API_URL}/posts`, data);
+
+		return response.data;
+	}
+);
 
 const postsSlice = createSlice({
 	initialState,
-	name: 'posts',
+	name: SLICE_NAME,
 	reducers: {
-		addPost: {
-			reducer: (state, action) => {
-				state.push(action.payload);
-			},
-			prepare: ({ title, content, authorId }) => {
-				return {
-					payload: {
-						id: nanoid(),
-						createdAt: new Date().toISOString(),
-						emojiReactions: _.clone(DEFAULT_EMOJI_REACTIONS),
-						title,
-						content,
-						authorId,
-					},
-				};
-			},
-		},
 		updatePost(state, action) {
-			const postToUpdate = state.find((post) => post.id === action.payload.id);
+			const postToUpdate = state.posts.find((post) => post.id === action.payload.id);
 
 			if (postToUpdate) {
 				postToUpdate.title = action.payload.title;
@@ -103,11 +39,11 @@ const postsSlice = createSlice({
 			}
 		},
 		/**
-		 * @param {Post[]} state
+		 * @param {import('./initialState').State} state
 		 * @param {{payload: {postId: string, emoji: string, value: string}}} action
 		 */
 		addValueToEmojiReactionCount(state, action) {
-			const postToUpdate = _.find(state, { id: action.payload.postId });
+			const postToUpdate = _.find(state.posts, { id: action.payload.postId });
 
 			if (postToUpdate) {
 				const emojiReaction = _.find(postToUpdate.emojiReactions, { emoji: action.payload.emoji });
@@ -118,20 +54,58 @@ const postsSlice = createSlice({
 			}
 		},
 	},
+	extraReducers: {
+		[loadPostsFromApi.pending]: (state, action) => {
+			state.status = Status.LOADING;
+		},
+		[loadPostsFromApi.fulfilled]: (state, action) => {
+			state.status = Status.SUCCESSFUL;
+
+			state.posts = action.payload;
+		},
+		[loadPostsFromApi.rejected]: (state, action) => {
+			state.status = Status.ERROR;
+
+			state.error = action.error.message;
+		},
+		[addPostToApi.fulfilled]: (state, action) => {
+			state.posts.push(action.payload);
+		},
+	},
 });
 
 /**
  * @param {Object} store
- * @returns {Post[]}
+ * @return {import('./initialState').Status}
  */
-export const selectPosts = (store) => store.posts;
+export const selectRequestStatus = (store) => store.posts.status;
+
+/**
+ * @param {Object} store
+ * @return {string}
+ */
+export const selectRequestError = (store) => store.posts.error;
+
+/**
+ * @param {Object} store
+ * @return {Post[]}
+ */
+export const selectPosts = (store) => store.posts.posts;
 
 /**
  * @param {string} id
- * @returns {(store:Object) => Post | undefined}
+ * @return {(store: Object) => Post | undefined}
  */
-export const selectPostById = (id) => (store) => store.posts.find((post) => post.id === id);
+export const selectPostById = (id) => (store) => store.posts.posts.find((post) => post.id === id);
 
-export const { addPost, updatePost, addValueToEmojiReactionCount } = postsSlice.actions;
+/**
+ * @param {string} authorId
+ * @return {(store: Object) => Post[]}
+ */
+export const selectPostsByAuthorId = (authorId) => (store) => {
+	return store.posts.posts.filter((post) => post.authorId === authorId);
+};
+
+export const { updatePost, addValueToEmojiReactionCount } = postsSlice.actions;
 
 export default postsSlice.reducer;
